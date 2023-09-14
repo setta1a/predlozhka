@@ -52,6 +52,8 @@ async def check_messages(message: types.Message):
             await bot.send_video(user_id,
                                  message.video.file_id)
 
+    await bot.send_message(message.chat.id, text="*** Ваше сообщение отправлено ***", parse_mode="Markdown")
+
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
