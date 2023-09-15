@@ -45,7 +45,7 @@ async def on_start(message: types.Message):
             mess = ""
             for user in blacklist.readlines():
                 mess += user
-            await bot.send_message(admin_id, text=mess)
+            await bot.send_message(admin_id, text="Черный писок:  \n" + mess)
             blacklist.close()
 
         else:
