@@ -20,7 +20,7 @@ raffle_members = []
 print(os.getcwd())
 
 def get_blacklist():
-    blacklist = open("blacklist.txt").readlines()
+    blacklist = open("/root/predlozhka/blacklist.txt").readlines()
     for i in range(len(blacklist)):
         blacklist[i] = blacklist[i].replace("\n", "")
 
