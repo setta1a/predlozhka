@@ -1,4 +1,5 @@
 import logging
+import os
 import random
 
 from aiogram import Bot, Dispatcher, types, executor
@@ -20,6 +21,7 @@ raffle_members = []
 
 def get_blacklist():
     blacklist = open("blacklist.txt").readlines()
+    print(os.getcwd())
     for i in range(len(blacklist)):
         blacklist[i] = blacklist[i].replace("\n", "")
 
