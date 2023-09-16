@@ -20,8 +20,8 @@ raffle_members = []
 
 
 def get_blacklist():
-    blacklist = open("blacklist.txt").readlines()
     print(os.getcwd())
+    blacklist = open("blacklist.txt").readlines()
     for i in range(len(blacklist)):
         blacklist[i] = blacklist[i].replace("\n", "")
 
