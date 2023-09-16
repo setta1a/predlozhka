@@ -31,7 +31,7 @@ def get_blacklist():
 async def on_start(message: types.Message):
     print("dasdsadasda:" + os.getcwd())
     await bot.send_message(chat_id=message.chat.id,
-                           text="*** Привет, это бот 'Предложка 2107' *** \n\nЧтобы предложить новость отправь боту любое сообщение. Все сообщения полностью анонимны" + os.getcwd(),
+                           text="*** Привет, это бот 'Предложка 2107' *** \n\nЧтобы предложить новость отправь боту любое сообщение. Все сообщения полностью анонимны",
                            parse_mode="Markdown")
 
 
