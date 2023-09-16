@@ -21,11 +21,11 @@ raffle_members = []
 
 def get_blacklist():
     print(os.getcwd())
-    blacklist = open("blacklist.txt").readlines()
-    for i in range(len(blacklist)):
-        blacklist[i] = blacklist[i].replace("\n", "")
-
-    return blacklist
+    # blacklist = open("blacklist.txt").readlines()
+    # for i in range(len(blacklist)):
+    #     blacklist[i] = blacklist[i].replace("\n", "")
+    #
+    # return blacklist
 
 
 @dp.message_handler(commands=['start'])
