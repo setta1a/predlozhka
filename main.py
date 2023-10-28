@@ -8,8 +8,6 @@ API_TOKEN = '6650827858:AAGgNXGMly3ox4qQFz0Ud5dZXcdF0TIJgPs'
 
 admin_id = "6420712889"
 
-path = "~/predlozhka/blacklist.txt"
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -95,8 +93,9 @@ async def on_raffle(message: types.Message):
 async def check_messages(message: types.Message):
     markup = types.InlineKeyboardMarkup()
     chat_id = message["from"].id
-    print(chat_id)
-    banlist = open(path).readlines()
+    await bot.send_message(admin_id,
+                           os.getcwd())
+    banlist = open("blacklist.txt").readlines()
     if str(message["from"].id) + '\n' not in banlist:
         if message.text:
             button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
@@ -149,7 +148,8 @@ async def check_messages(message: types.Message):
 
 @dp.callback_query_handler(lambda call: str)
 async def ban_user(call):
-    file = open(path, "a")
+    print(os.getcwd())
+    file = open("blacklist.txt", "a")
     file.write(str(call.data) + '\n')
     file.close()
 
