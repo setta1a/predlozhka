@@ -93,9 +93,7 @@ async def on_raffle(message: types.Message):
 async def check_messages(message: types.Message):
     markup = types.InlineKeyboardMarkup()
     chat_id = message["from"].id
-    await bot.send_message(admin_id,
-                           os.getcwd())
-    banlist = open("blacklist.txt").readlines()
+    banlist = open("/root/predlozhka/blacklist.txt").readlines()
     if str(message["from"].id) + '\n' not in banlist:
         if message.text:
             button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
@@ -149,7 +147,7 @@ async def check_messages(message: types.Message):
 @dp.callback_query_handler(lambda call: str)
 async def ban_user(call):
     print(os.getcwd())
-    file = open("blacklist.txt", "a")
+    file = open("/root/predlozhka/blacklist.txt", "a")
     file.write(str(call.data) + '\n')
     file.close()
 
