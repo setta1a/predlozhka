@@ -91,36 +91,65 @@ async def on_raffle(message: types.Message):
 
 @dp.message_handler(content_types=["text", "photo", "video"])
 async def check_messages(message: types.Message):
-    if message.text:
-        await bot.send_message(admin_id,
-                               "📨 *** Получено новое сообщение *** \n\n" + message.text,
-                               parse_mode="Markdown")
-    if message.photo:
-        print(message.photo)
-        if message.caption:
-            await bot.send_photo(admin_id,
-                                 message.photo[-1].file_id,
-                                 caption="📨 *** Получено новое сообщение *** \n\n" + message.caption,
-                                 parse_mode="Markdown")
-        else:
-            await bot.send_photo(admin_id,
-                                 message.photo[-1].file_id,
-                                 caption="📨 *** Получено новое фото *** \n",
-                                 parse_mode="Markdown")
-    if message.video:
-        print(message.video)
-        if message.caption:
-            await bot.send_video(admin_id,
-                                 message.video.file_id,
-                                 caption="📨 *** Получено новое сообщение *** \n\n" + message.caption,
-                                 parse_mode="Markdown")
-        else:
-            await bot.send_video(admin_id,
-                                 message.video.file_id,
-                                 caption="📨 *** Получено новое видео *** \n",
-                                 parse_mode="Markdown")
+    markup = types.InlineKeyboardMarkup()
+    chat_id = message["from"].id
+    print(chat_id)
+    banlist = open("blacklist.txt").readlines()
+    if str(message["from"].id) + '\n' not in banlist:
+        if message.text:
+            button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
+            markup.add(button1)
+            await bot.send_message(admin_id,
+                                   "📨 *** Получено новое сообщение *** \n\n" + message.text,
+                                   parse_mode="Markdown",
+                                   reply_markup=markup)
+        if message.photo:
+            print(message.photo)
+            button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
+            markup.add(button1)
+            if message.caption:
+                await bot.send_photo(admin_id,
+                                     message.photo[-1].file_id,
+                                     caption="📨 *** Получено новое сообщение *** \n\n" + message.caption,
+                                     parse_mode="Markdown",
+                                     reply_markup=markup)
+            else:
+                await bot.send_photo(admin_id,
+                                     message.photo[-1].file_id,
+                                     caption="📨 *** Получено новое фото *** \n",
+                                     parse_mode="Markdown",
+                                     reply_markup=markup)
+        if message.video:
+            print(message.video)
+            button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
+            markup.add(button1)
+            if message.caption:
+                await bot.send_video(admin_id,
+                                     message.video.file_id,
+                                     caption="📨 *** Получено новое сообщение *** \n\n" + message.caption,
+                                     parse_mode="Markdown",
+                                     reply_markup=markup)
+            else:
+                await bot.send_video(admin_id,
+                                     message.video.file_id,
+                                     caption="📨 *** Получено новое видео *** \n",
+                                     parse_mode="Markdown",
+                                     reply_markup=markup)
 
-    await bot.send_message(message.chat.id, text="*** Ваше сообщение отправлено ***", parse_mode="Markdown")
+
+
+        await bot.send_message(message.chat.id, text="*** Ваше сообщение отправлено ***", parse_mode="Markdown")
+    else:
+        await bot.send_message(message.chat.id, text="*** Вы находитесь в чёрном списке данного бота ***"
+                                                     "\n\nЕсли вы считаете, что попали сюда незаслуженно, напишите администратору данного бота\n\n@setta1a", parse_mode="Markdown")
+
+
+
+@dp.callback_query_handler(lambda call: str)
+async def ban_user(call):
+    file = open("blacklist.txt", "a")
+    file.write(str(call.data) + '\n')
+    file.close()
 
 
 if __name__ == '__main__':
