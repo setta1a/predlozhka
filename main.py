@@ -2,9 +2,16 @@ import logging
 import os
 import random
 
+from typing import List
+
+from aiogram.dispatcher.filters import MediaGroupFilter
+from aiogram.types import ContentType
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram_media_group import media_group_handler
+
 from aiogram import Bot, Dispatcher, types, executor
 
-API_TOKEN = '6650827858:AAGgNXGMly3ox4qQFz0Ud5dZXcdF0TIJgPs'
+API_TOKEN = '5805471744:AAGRKUJld2uqDC1N45C4OtpSzjUBhUl1LYs'
 
 admin_id = "6420712889"
 
@@ -12,13 +19,12 @@ admin_id = "6420712889"
 logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot, storage=MemoryStorage())
 logging.basicConfig(level=logging.INFO)
 
 is_raffle_start = False
 raffle_members = []
 print(os.getcwd())
-
 
 @dp.message_handler(commands=['start'])
 async def on_start(message: types.Message):
@@ -88,12 +94,50 @@ async def on_raffle(message: types.Message):
                                    parse_mode="Markdown")
 
 
+@dp.message_handler(MediaGroupFilter(is_media_group=True), content_types=[ContentType.AUDIO, ContentType.PHOTO, ContentType.VIDEO, ContentType.TEXT])
+@media_group_handler
+async def album_handler(message: List[types.Message]):
+    # reply keyboard -> ban user
+    markup = types.InlineKeyboardMarkup()
+    button1 = types.InlineKeyboardButton("Забанить", callback_data=message[0]['from'].id)
+    markup.add(button1)
+    # create media list -> send to admin
+    media = []
+    for m in message:
+        if m.photo:
+            caption = ""
+            if type(m.caption) == str:
+                caption = "📨 *** Получено новое сообщение *** \n\n" + m.caption
+            media.append(types.InputMediaPhoto(
+                media=m.photo[-1].file_id,
+                caption=caption,
+                caption_entities=m.caption_entities,
+                parse_mode="Markdown"
+            ))
+        elif m.video:
+            caption = ""
+            if type(m.caption) == str:
+                caption = "📨 *** Получено новое сообщение *** \n\n" + m.caption
+            media.append(types.InputMediaVideo(
+                media=m.video.file_id,
+                caption=caption,
+                caption_entities=m.caption_entities,
+                parse_mode="Markdown"
+            ))
+    # send messages separately (no keyboard + media_group)
+    await bot.send_media_group(chat_id=admin_id, media=media)
+    # with keyboard
+    await bot.send_message(admin_id,
+                           "Забанить?",
+                           parse_mode="Markdown",
+                           reply_markup=markup)
+
 
 @dp.message_handler(content_types=["text", "photo", "video"])
 async def check_messages(message: types.Message):
     markup = types.InlineKeyboardMarkup()
     chat_id = message["from"].id
-    banlist = open("/root/predlozhka/blacklist.txt").readlines()
+    banlist = open("blacklist.txt").readlines()
     if str(message["from"].id) + '\n' not in banlist:
         if message.text:
             button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
@@ -135,19 +179,16 @@ async def check_messages(message: types.Message):
                                      parse_mode="Markdown",
                                      reply_markup=markup)
 
-
-
         await bot.send_message(message.chat.id, text="*** Ваше сообщение отправлено ***", parse_mode="Markdown")
     else:
         await bot.send_message(message.chat.id, text="*** Вы находитесь в чёрном списке данного бота ***"
                                                      "\n\nЕсли вы считаете, что попали сюда незаслуженно, напишите администратору данного бота\n\n@setta1a", parse_mode="Markdown")
 
 
-
 @dp.callback_query_handler(lambda call: str)
 async def ban_user(call):
     print(os.getcwd())
-    file = open("/root/predlozhka/blacklist.txt", "a")
+    file = open("blacklist.txt", "a")
     file.write(str(call.data) + '\n')
     file.close()
 
