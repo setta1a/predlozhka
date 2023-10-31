@@ -11,7 +11,7 @@ from aiogram_media_group import media_group_handler
 
 from aiogram import Bot, Dispatcher, types, executor
 
-API_TOKEN = '5805471744:AAGRKUJld2uqDC1N45C4OtpSzjUBhUl1LYs'
+API_TOKEN = '6650827858:AAGgNXGMly3ox4qQFz0Ud5dZXcdF0TIJgPs'
 
 admin_id = "6420712889"
 
@@ -137,7 +137,7 @@ async def album_handler(message: List[types.Message]):
 async def check_messages(message: types.Message):
     markup = types.InlineKeyboardMarkup()
     chat_id = message["from"].id
-    banlist = open("blacklist.txt").readlines()
+    banlist = open("/root/predlozhka/blacklist.txt").readlines()
     if str(message["from"].id) + '\n' not in banlist:
         if message.text:
             button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
@@ -188,7 +188,7 @@ async def check_messages(message: types.Message):
 @dp.callback_query_handler(lambda call: str)
 async def ban_user(call):
     print(os.getcwd())
-    file = open("blacklist.txt", "a")
+    file = open("/root/predlozhka/blacklist.txt", "a")
     file.write(str(call.data) + '\n')
     file.close()
 
