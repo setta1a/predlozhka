@@ -8,6 +8,7 @@ from aiogram.dispatcher.filters import MediaGroupFilter
 from aiogram.types import ContentType
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram_media_group import media_group_handler
+from path_to_blacklist import path
 
 from aiogram import Bot, Dispatcher, types, executor
 
@@ -137,7 +138,7 @@ async def album_handler(message: List[types.Message]):
 async def check_messages(message: types.Message):
     markup = types.InlineKeyboardMarkup()
     chat_id = message["from"].id
-    banlist = open("/root/predlozhka/blacklist.txt").readlines()
+    banlist = open(path).readlines()
     if str(message["from"].id) + '\n' not in banlist:
         if message.text:
             button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
@@ -188,7 +189,7 @@ async def check_messages(message: types.Message):
 @dp.callback_query_handler(lambda call: str)
 async def ban_user(call):
     print(os.getcwd())
-    file = open("/root/predlozhka/blacklist.txt", "a")
+    file = open(path, "a")
     file.write(str(call.data) + '\n')
     file.close()
 
