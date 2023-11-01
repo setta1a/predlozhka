@@ -1,1 +1,1 @@
-path = "/root/predlozhka/blacklist.txt"
+path = "blacklist.txt"

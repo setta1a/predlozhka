@@ -103,35 +103,42 @@ async def album_handler(message: List[types.Message]):
     button1 = types.InlineKeyboardButton("Забанить", callback_data=message[0]['from'].id)
     markup.add(button1)
     # create media list -> send to admin
-    media = []
-    for m in message:
-        if m.photo:
-            caption = ""
-            if type(m.caption) == str:
-                caption = "📨 *** Получено новое сообщение *** \n\n" + m.caption
-            media.append(types.InputMediaPhoto(
-                media=m.photo[-1].file_id,
-                caption=caption,
-                caption_entities=m.caption_entities,
-                parse_mode="Markdown"
-            ))
-        elif m.video:
-            caption = ""
-            if type(m.caption) == str:
-                caption = "📨 *** Получено новое сообщение *** \n\n" + m.caption
-            media.append(types.InputMediaVideo(
-                media=m.video.file_id,
-                caption=caption,
-                caption_entities=m.caption_entities,
-                parse_mode="Markdown"
-            ))
-    # send messages separately (no keyboard + media_group)
-    await bot.send_media_group(chat_id=admin_id, media=media)
-    # with keyboard
-    await bot.send_message(admin_id,
-                           "Забанить?",
-                           parse_mode="Markdown",
-                           reply_markup=markup)
+    user_channel_status = await bot.get_chat_member(chat_id=-1001514981704, user_id=int(message.chat.id))
+    if user_channel_status["status"] != 'left':
+
+        media = []
+        for m in message:
+            if m.photo:
+                caption = ""
+                if type(m.caption) == str:
+                    caption = "📨 *** Получено новое сообщение *** \n\n" + m.caption
+                media.append(types.InputMediaPhoto(
+                    media=m.photo[-1].file_id,
+                    caption=caption,
+                    caption_entities=m.caption_entities,
+                    parse_mode="Markdown"
+                ))
+            elif m.video:
+                caption = ""
+                if type(m.caption) == str:
+                    caption = "📨 *** Получено новое сообщение *** \n\n" + m.caption
+                media.append(types.InputMediaVideo(
+                    media=m.video.file_id,
+                    caption=caption,
+                    caption_entities=m.caption_entities,
+                    parse_mode="Markdown"
+                ))
+        # send messages separately (no keyboard + media_group)
+        await bot.send_media_group(chat_id=admin_id, media=media)
+        # with keyboard
+        await bot.send_message(admin_id,
+                               "Забанить?",
+                               parse_mode="Markdown",
+                               reply_markup=markup)
+    else:
+        await bot.send_message(message.chat.id, text="*** Вы находитесь в чёрном списке данного бота ***"
+                                                     "\n\nЕсли вы считаете, что попали сюда незаслуженно, напишите администратору данного бота\n\n@setta1a",
+                               parse_mode="Markdown")
 
 
 @dp.message_handler(content_types=["text", "photo", "video"])
@@ -140,51 +147,56 @@ async def check_messages(message: types.Message):
     chat_id = message["from"].id
     banlist = open(path).readlines()
     if str(message["from"].id) + '\n' not in banlist:
-        if message.text:
-            button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
-            markup.add(button1)
-            await bot.send_message(admin_id,
-                                   "📨 *** Получено новое сообщение *** \n\n" + message.text,
-                                   parse_mode="Markdown",
-                                   reply_markup=markup)
-        if message.photo:
-            print(message.photo)
-            button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
-            markup.add(button1)
-            if message.caption:
-                await bot.send_photo(admin_id,
-                                     message.photo[-1].file_id,
-                                     caption="📨 *** Получено новое сообщение *** \n\n" + message.caption,
-                                     parse_mode="Markdown",
-                                     reply_markup=markup)
-            else:
-                await bot.send_photo(admin_id,
-                                     message.photo[-1].file_id,
-                                     caption="📨 *** Получено новое фото *** \n",
-                                     parse_mode="Markdown",
-                                     reply_markup=markup)
-        if message.video:
-            print(message.video)
-            button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
-            markup.add(button1)
-            if message.caption:
-                await bot.send_video(admin_id,
-                                     message.video.file_id,
-                                     caption="📨 *** Получено новое сообщение *** \n\n" + message.caption,
-                                     parse_mode="Markdown",
-                                     reply_markup=markup)
-            else:
-                await bot.send_video(admin_id,
-                                     message.video.file_id,
-                                     caption="📨 *** Получено новое видео *** \n",
-                                     parse_mode="Markdown",
-                                     reply_markup=markup)
+        user_channel_status = await bot.get_chat_member(chat_id=-1001514981704, user_id=int(message.chat.id))
+        if user_channel_status["status"] != 'left':
+            if message.text:
+                button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
+                markup.add(button1)
+                await bot.send_message(admin_id,
+                                       "📨 *** Получено новое сообщение *** \n\n" + message.text,
+                                       parse_mode="Markdown",
+                                       reply_markup=markup)
+            if message.photo:
+                print(message.photo)
+                button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
+                markup.add(button1)
+                if message.caption:
+                    await bot.send_photo(admin_id,
+                                         message.photo[-1].file_id,
+                                         caption="📨 *** Получено новое сообщение *** \n\n" + message.caption,
+                                         parse_mode="Markdown",
+                                         reply_markup=markup)
+                else:
+                    await bot.send_photo(admin_id,
+                                         message.photo[-1].file_id,
+                                         caption="📨 *** Получено новое фото *** \n",
+                                         parse_mode="Markdown",
+                                         reply_markup=markup)
+            if message.video:
+                print(message.video)
+                button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
+                markup.add(button1)
+                if message.caption:
+                    await bot.send_video(admin_id,
+                                         message.video.file_id,
+                                         caption="📨 *** Получено новое сообщение *** \n\n" + message.caption,
+                                         parse_mode="Markdown",
+                                         reply_markup=markup)
+                else:
+                    await bot.send_video(admin_id,
+                                         message.video.file_id,
+                                         caption="📨 *** Получено новое видео *** \n",
+                                         parse_mode="Markdown",
+                                         reply_markup=markup)
 
-        await bot.send_message(message.chat.id, text="*** Ваше сообщение отправлено ***", parse_mode="Markdown")
+            await bot.send_message(message.chat.id, text="*** Ваше сообщение отправлено ***", parse_mode="Markdown")
+        else:
+            await bot.send_message(message.from_user.id,
+                                   "***Чтобы отправлять сообщения, вы должны быть подписаны на канал!!***\n\n@podslush2107",
+                                   parse_mode="Markdown")
     else:
         await bot.send_message(message.chat.id, text="*** Вы находитесь в чёрном списке данного бота ***"
                                                      "\n\nЕсли вы считаете, что попали сюда незаслуженно, напишите администратору данного бота\n\n@setta1a", parse_mode="Markdown")
-
 
 @dp.callback_query_handler(lambda call: str)
 async def ban_user(call):
