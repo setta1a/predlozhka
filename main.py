@@ -152,7 +152,7 @@ async def check_messages(message: types.Message):
     markup = types.InlineKeyboardMarkup()
     chat_id = message["from"].id
     banlist = open(path).readlines()
-    if hash(str(message["from"].id)) + '\n' not in banlist:
+    if str(hash(str(message["from"].id))) + '\n' not in banlist:
         user_channel_status = await bot.get_chat_member(chat_id=-1001514981704, user_id=int(message.chat.id))
         if user_channel_status["status"] != 'left':
             if message.text:
