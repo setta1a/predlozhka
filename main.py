@@ -208,7 +208,7 @@ async def check_messages(message: types.Message):
 async def ban_user(call):
     print(os.getcwd())
     file = open(path, "a")
-    file.write(hash(str(call.data)) + '\n')
+    file.write(str(hash(str(call.data))) + '\n')
     file.close()
 
 
