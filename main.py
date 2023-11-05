@@ -105,8 +105,8 @@ async def album_handler(message: List[types.Message]):
     # create media list -> send to admin
     user_channel_status = await bot.get_chat_member(chat_id=-1001514981704, user_id=int(message.chat.id))
     if user_channel_status["status"] != 'left':
-
-        if hash(str(message["from"].id)) + '\n' not in banlist:
+        banlist = open(path).readlines()
+        if str(hash(str(message["from"].id))) + '\n' not in banlist:
             media = []
             for m in message:
                 if m.photo:
