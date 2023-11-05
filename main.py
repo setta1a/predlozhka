@@ -106,38 +106,44 @@ async def album_handler(message: List[types.Message]):
     user_channel_status = await bot.get_chat_member(chat_id=-1001514981704, user_id=int(message.chat.id))
     if user_channel_status["status"] != 'left':
 
-        media = []
-        for m in message:
-            if m.photo:
-                caption = ""
-                if type(m.caption) == str:
-                    caption = "📨 *** Получено новое сообщение *** \n\n" + m.caption
-                media.append(types.InputMediaPhoto(
-                    media=m.photo[-1].file_id,
-                    caption=caption,
-                    caption_entities=m.caption_entities,
-                    parse_mode="Markdown"
-                ))
-            elif m.video:
-                caption = ""
-                if type(m.caption) == str:
-                    caption = "📨 *** Получено новое сообщение *** \n\n" + m.caption
-                media.append(types.InputMediaVideo(
-                    media=m.video.file_id,
-                    caption=caption,
-                    caption_entities=m.caption_entities,
-                    parse_mode="Markdown"
-                ))
-        # send messages separately (no keyboard + media_group)
-        await bot.send_media_group(chat_id=admin_id, media=media)
-        # with keyboard
-        await bot.send_message(admin_id,
-                               "Забанить?",
-                               parse_mode="Markdown",
-                               reply_markup=markup)
+        if hash(str(message["from"].id)) + '\n' not in banlist:
+            media = []
+            for m in message:
+                if m.photo:
+                    caption = ""
+                    if type(m.caption) == str:
+                        caption = "📨 *** Получено новое сообщение *** \n\n" + m.caption
+                    media.append(types.InputMediaPhoto(
+                        media=m.photo[-1].file_id,
+                        caption=caption,
+                        caption_entities=m.caption_entities,
+                        parse_mode="Markdown"
+                    ))
+                elif m.video:
+                    caption = ""
+                    if type(m.caption) == str:
+                        caption = "📨 *** Получено новое сообщение *** \n\n" + m.caption
+                    media.append(types.InputMediaVideo(
+                        media=m.video.file_id,
+                        caption=caption,
+                        caption_entities=m.caption_entities,
+                        parse_mode="Markdown"
+                    ))
+            # send messages separately (no keyboard + media_group)
+            await bot.send_media_group(chat_id=admin_id, media=media)
+            # with keyboard
+            await bot.send_message(admin_id,
+                                   "Забанить?",
+                                   parse_mode="Markdown",
+                                   reply_markup=markup)
+        else:
+            await bot.send_message(message.chat.id, text="*** Вы находитесь в чёрном списке данного бота ***"
+                                                         "\n\nЕсли вы считаете, что попали сюда незаслуженно, напишите администратору данного бота\n\n@setta1a",
+                                   parse_mode="Markdown")
+
     else:
-        await bot.send_message(message.chat.id, text="*** Вы находитесь в чёрном списке данного бота ***"
-                                                     "\n\nЕсли вы считаете, что попали сюда незаслуженно, напишите администратору данного бота\n\n@setta1a",
+        await bot.send_message(message.from_user.id,
+                               "***Чтобы отправлять сообщения, вы должны быть подписаны на канал!!***\n\n@podslush2107",
                                parse_mode="Markdown")
 
 
@@ -146,7 +152,7 @@ async def check_messages(message: types.Message):
     markup = types.InlineKeyboardMarkup()
     chat_id = message["from"].id
     banlist = open(path).readlines()
-    if str(message["from"].id) + '\n' not in banlist:
+    if hash(str(message["from"].id)) + '\n' not in banlist:
         user_channel_status = await bot.get_chat_member(chat_id=-1001514981704, user_id=int(message.chat.id))
         if user_channel_status["status"] != 'left':
             if message.text:
@@ -202,7 +208,7 @@ async def check_messages(message: types.Message):
 async def ban_user(call):
     print(os.getcwd())
     file = open(path, "a")
-    file.write(str(call.data) + '\n')
+    file.write(hash(str(call.data)) + '\n')
     file.close()
 
 
