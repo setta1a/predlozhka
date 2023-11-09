@@ -2,18 +2,19 @@ import logging
 import os
 import random
 import hashlib
+from dotenv import load_dotenv
 
 from typing import List
-
 from aiogram.dispatcher.filters import MediaGroupFilter
 from aiogram.types import ContentType
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram_media_group import media_group_handler
-from path_to_blacklist import path
-
 from aiogram import Bot, Dispatcher, types, executor
 
-API_TOKEN = '6650827858:AAGgNXGMly3ox4qQFz0Ud5dZXcdF0TIJgPs'
+load_dotenv()
+
+API_TOKEN = os.getenv("TOKEN")
+path = os.getenv("PUT") + ".txt"
 
 admin_id = "6420712889"
 
