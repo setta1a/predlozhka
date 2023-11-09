@@ -1,6 +1,7 @@
 import logging
 import os
 import random
+import hashlib
 
 from typing import List
 
@@ -106,7 +107,7 @@ async def album_handler(message: List[types.Message]):
     user_channel_status = await bot.get_chat_member(chat_id=-1001514981704, user_id=int(message.chat.id))
     if user_channel_status["status"] != 'left':
         banlist = open(path).readlines()
-        if str(hash(str(message["from"].id))) + '\n' not in banlist:
+        if hashlib.md5(str(message["from"].id).encode).hexdigest() + '\n' not in banlist:
             media = []
             for m in message:
                 if m.photo:
@@ -152,7 +153,7 @@ async def check_messages(message: types.Message):
     markup = types.InlineKeyboardMarkup()
     chat_id = message["from"].id
     banlist = open(path).readlines()
-    if str(hash(str(message["from"].id))) + '\n' not in banlist:
+    if hashlib.md5(str(message["from"].id).encode()).hexdigest() + '\n' not in banlist:
         user_channel_status = await bot.get_chat_member(chat_id=-1001514981704, user_id=int(message.chat.id))
         if user_channel_status["status"] != 'left':
             if message.text:
@@ -208,7 +209,7 @@ async def check_messages(message: types.Message):
 async def ban_user(call):
     print(os.getcwd())
     file = open(path, "a")
-    file.write(str(hash(str(call.data))) + '\n')
+    file.write(hashlib.md5(str(call.data).encode()).hexdigest() + '\n')
     file.close()
 
 
