@@ -163,12 +163,13 @@ async def check_messages(message: types.Message):
         user_channel_status = await bot.get_chat_member(chat_id=-1001514981704, user_id=int(message.chat.id))
         if user_channel_status["status"] != 'left':
             if message.text:
-                button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
-                markup.add(button1)
-                await bot.send_message(admin_id,
-                                       "📨 *** Получено новое сообщение *** \n\n" + message.text,
-                                       parse_mode="Markdown",
-                                       reply_markup=markup)
+                if str(message["from"].id) != str(admin_id):
+                    button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
+                    markup.add(button1)
+                    await bot.send_message(admin_id,
+                                           "📨 *** Получено новое сообщение *** \n\n" + message.text,
+                                           parse_mode="Markdown",
+                                           reply_markup=markup)
             if message.photo:
                 print(message.photo)
                 button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
@@ -201,8 +202,8 @@ async def check_messages(message: types.Message):
                                          caption="📨 *** Получено новое видео *** \n",
                                          parse_mode="Markdown",
                                          reply_markup=markup)
-
-            await bot.send_message(message.chat.id, text="*** Ваше сообщение отправлено ***", parse_mode="Markdown")
+            if str(message["from"].id) != str(admin_id):
+                await bot.send_message(message.chat.id, text="*** Ваше сообщение отправлено ***", parse_mode="Markdown")
         else:
             await bot.send_message(message.from_user.id,
                                    "***Чтобы отправлять сообщения, вы должны быть подписаны на канал!!***\n\n@podslush2107",
