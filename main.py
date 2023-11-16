@@ -79,10 +79,15 @@ async def on_raffle(message: types.Message):
                                    text="*** Ты выиграл(а) в розыгрыше!!! ***",
                                    parse_mode="Markdown")
 
+    elif text == "get_members":
+        string = ""
+        for usr in raffle_members:
+            string += usr[1] + '\n'
+        await bot.send_message(chat_id=admin_id, text=f"{string}")
     elif not text:
         if is_raffle_start:
             if message.chat.id not in raffle_members:
-                raffle_members.append(message.chat.id)
+                raffle_members.append((message.chat.id, message.chat.first_name))
                 await bot.send_message(chat_id=message.chat.id,
                                        text="*** Вы приняли участие в розыгрыше ***",
                                        parse_mode="Markdown")
