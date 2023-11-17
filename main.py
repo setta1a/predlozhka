@@ -107,7 +107,7 @@ async def on_raffle(message: types.Message):
 async def album_handler(message: List[types.Message]):
     # reply keyboard -> ban user
     markup = types.InlineKeyboardMarkup()
-    button1 = types.InlineKeyboardButton("Забанить", callback_data=message[0]['from'].id)
+    button1 = types.InlineKeyboardButton("Забанить", callback_data=(message[0]['from'].id, message.date))
     markup.add(button1)
     # create media list -> send to admin
     user_channel_status = await bot.get_chat_member(chat_id=-1001514981704, user_id=int(message.chat.id))
@@ -164,7 +164,7 @@ async def check_messages(message: types.Message):
         if user_channel_status["status"] != 'left':
             if message.text:
                 if str(message["from"].id) != str(admin_id):
-                    button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
+                    button1 = types.InlineKeyboardButton("Забанить", callback_data=(str(chat_id) + str(message.date)))
                     markup.add(button1)
                     await bot.send_message(admin_id,
                                            "📨 *** Получено новое сообщение *** \n\n" + message.text,
@@ -172,7 +172,7 @@ async def check_messages(message: types.Message):
                                            reply_markup=markup)
             if message.photo:
                 print(message.photo)
-                button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
+                button1 = types.InlineKeyboardButton("Забанить", callback_data=(chat_id, message.date))
                 markup.add(button1)
                 if message.caption:
                     await bot.send_photo(admin_id,
@@ -188,7 +188,7 @@ async def check_messages(message: types.Message):
                                          reply_markup=markup)
             if message.video:
                 print(message.video)
-                button1 = types.InlineKeyboardButton("Забанить", callback_data=chat_id)
+                button1 = types.InlineKeyboardButton("Забанить", callback_data=(chat_id, message.date))
                 markup.add(button1)
                 if message.caption:
                     await bot.send_video(admin_id,
@@ -215,9 +215,13 @@ async def check_messages(message: types.Message):
 @dp.callback_query_handler(lambda call: str)
 async def ban_user(call):
     print(os.getcwd())
+    user_id, date = call.data.split()
     file = open(path, "a")
-    file.write(hashlib.md5(str(call.data).encode()).hexdigest() + '\n')
+    blwt = open(path.replace("blacklist.txt", "") + "ban_list_with_time.txt", "a")
+    file.write(hashlib.md5(user_id.encode()).hexdigest() + '\n')
+    blwt.write(hashlib.md5(user_id.encode()).hexdigest() + ' ' + date + '\n')
     file.close()
+    blwt.close()
 
 
 if __name__ == '__main__':
